@@ -1,0 +1,34 @@
+# PartNet-Mobility dataset configuration
+dataset:
+  name: partnet_mobility
+  root_dir: data_cache/partnet_mobility
+  categories:
+    - laptop
+    - microwave
+    - refrigerator
+    - cabinet
+    - dishwasher
+    - safe
+
+  split_ratio:
+    train: 0.8
+    val: 0.1
+    test: 0.1
+
+  video:
+    num_frames: 8
+    resolution: 256
+    camera: fixed
+    background: clean
+
+  cache:
+    omnipart_dir: omnipart
+    wan_dir: wan
+    motion_dir: motion
+
+  augmentation:
+    random_flip: false
+    random_rotation: false
+
+  max_parts: 10
+  single_moving_part: true

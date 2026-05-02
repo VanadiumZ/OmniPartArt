@@ -1,0 +1,30 @@
+# E1-C: Late fusion baseline
+model:
+  name: late_fusion
+  slat_dim: 8
+  video_dim: 1280
+  hidden_dim: 256
+  num_layers: 4
+  num_heads: 8
+  fusion_method: gated  # concat, add, gated
+
+decoder:
+  joint_type_classes: 3
+  axis_dim: 3
+  pivot_dim: 3
+  state_dim: 2
+
+training:
+  lr: 1.0e-4
+  weight_decay: 1.0e-5
+  epochs: 100
+  batch_size: 16
+  scheduler: cosine
+  warmup_epochs: 5
+
+loss:
+  lambda_part: 1.0
+  lambda_type: 1.0
+  lambda_axis: 5.0
+  lambda_pivot: 2.0
+  lambda_state: 1.0

@@ -1,0 +1,32 @@
+# E1-A: 3D-only baseline
+model:
+  name: baseline_3d
+  slat_dim: 8
+  hidden_dim: 256
+  num_layers: 4
+  num_heads: 8
+  max_parts: 10
+  use_bbox: true
+  use_slat_pool: true
+  pool_method: mean_max  # mean, max, mean_max
+
+decoder:
+  joint_type_classes: 3  # fixed, revolute, prismatic
+  axis_dim: 3
+  pivot_dim: 3
+  state_dim: 2  # sin, cos for revolute; displacement for prismatic
+
+training:
+  lr: 1.0e-4
+  weight_decay: 1.0e-5
+  epochs: 100
+  batch_size: 16
+  scheduler: cosine
+  warmup_epochs: 5
+
+loss:
+  lambda_part: 1.0
+  lambda_type: 1.0
+  lambda_axis: 5.0
+  lambda_pivot: 2.0
+  lambda_state: 1.0

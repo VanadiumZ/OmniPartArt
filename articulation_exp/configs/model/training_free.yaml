@@ -1,0 +1,41 @@
+# TF0/TF1/TF2: Training-free branch configuration
+training_free:
+  # TF0: Geometry + Motion candidate fitting
+  tf0:
+    num_axis_candidates: 20
+    num_pivot_candidates: 10
+    joint_types: [revolute, prismatic]
+    scoring:
+      lambda_mask: 1.0
+      lambda_track: 1.0
+      lambda_collision: 0.5
+      lambda_range: 0.3
+      lambda_smooth: 0.2
+
+  # TF1: Wan feature scoring
+  tf1:
+    wan_feature_source: dit_middle
+    representation: mask_video  # mask_video, silhouette, normal
+    scoring:
+      lambda_geom: 1.0
+      lambda_track: 1.0
+      lambda_wan: 0.5
+      lambda_collision: 0.3
+      lambda_smooth: 0.2
+
+  # TF2: Kinematic refinement
+  tf2:
+    optimizer: adam
+    lr: 0.01
+    num_iterations: 200
+    optimize_axis: true
+    optimize_pivot: true
+    optimize_state: true
+    optimize_se3: false
+    loss:
+      lambda_mask: 1.0
+      lambda_track: 1.0
+      lambda_silhouette: 0.5
+      lambda_collision: 0.3
+      lambda_smooth: 0.2
+      lambda_wan: 0.3

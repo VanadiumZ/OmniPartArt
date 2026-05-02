@@ -245,6 +245,9 @@ class BboxGen(nn.Module):
         group_emb[:, :masks_emb.shape[1], :] = masks_emb
         image_latents = torch.cat([image_latents, group_emb], dim=-1) 
         image_latents = self.image_projector(image_latents)
+        # 这里针对 image_latents 和 masks_emb 进行融合，得到 image_latents_with_masks
+        # 这里用了拼接加上线性投影
+        # merge的替代应该在前一步生成mask的时候做？
 
         points = batch['points'][..., :3]
         rot_matrix = torch.tensor([[1, 0, 0], [0, 0, -1], [0, 1, 0]], device=points.device, dtype=points.dtype)

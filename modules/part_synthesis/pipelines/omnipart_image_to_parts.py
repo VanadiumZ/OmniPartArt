@@ -83,7 +83,13 @@ class OmniPartImageTo3DPipeline(Pipeline):
         Args:
             name (str): Name of the DINOv2 model to load
         """
-        dinov2_model = torch.hub.load('facebookresearch/dinov2', name)
+        try:
+            # 优先尝试从本地缓存加载以避免网络问题
+            dinov2_model = torch.hub.load('/root/.cache/torch/hub/facebookresearch_dinov2_main', name, source='local')
+        except Exception as e:
+            print(f"Failed to load from local: {e}, falling back to remote...")
+            dinov2_model = torch.hub.load('facebookresearch/dinov2', name)
+            
         dinov2_model.eval()
         self.models['image_cond_model'] = dinov2_model
         
@@ -326,7 +332,7 @@ class OmniPartImageTo3DPipeline(Pipeline):
         self,
         image: Union[Image.Image, List[Image.Image], torch.Tensor],
         coords: torch.Tensor,
-        part_layouts: List[slice], 
+        part_layouts: List[slice], # 这里是一个list[整个物体点slice, part1 slice, part2 slice, ...]
         masks: torch.Tensor,
         seed: int = 42,
         slat_sampler_params: dict = {},

@@ -40,6 +40,7 @@ if __name__ == "__main__":
     torch.manual_seed(args.seed)
 
     # load part_synthesis model
+    # instantiate the pipeline
     part_synthesis_pipeline = OmniPartImageTo3DPipeline.from_pretrained(args.part_synthesis_ckpt)
     part_synthesis_pipeline.to(device)
     print("[INFO] PartSynthesis model loaded")
@@ -47,6 +48,7 @@ if __name__ == "__main__":
     # load bbox_gen model
     bbox_gen_config = OmegaConf.load("configs/bbox_gen.yaml").model.args
     bbox_gen_config.partfield_encoder_path = args.partfield_encoder_path
+    # instantiate the bbox gen model
     bbox_gen_model = BboxGen(bbox_gen_config)
     bbox_gen_model.load_state_dict(torch.load(args.bbox_gen_ckpt), strict=False)
     bbox_gen_model.to(device)
@@ -54,16 +56,22 @@ if __name__ == "__main__":
     print("[INFO] BboxGen model loaded")
     
     img_white_bg, img_black_bg, ordered_mask_input, img_mask_vis = load_img_mask(args.image_input, args.mask_input)
+    
+    # img mask vis is only used for visualization to check the mask is correct
     img_mask_vis.save(os.path.join(output_dir, "img_mask_vis.png"))
 
     voxel_coords = part_synthesis_pipeline.get_coords(img_black_bg, num_samples=1, seed=args.seed, sparse_structure_sampler_params={"steps": 25, "cfg_strength": 7.5})
     voxel_coords = voxel_coords.cpu().numpy()
     np.save(os.path.join(output_dir, "voxel_coords.npy"), voxel_coords)
+
+    # for visualization to check the voxel in Trellis Stage I
     voxel_coords_ply = vis_voxel_coords(voxel_coords)
     voxel_coords_ply.export(os.path.join(output_dir, "voxel_coords_vis.ply"))
     print("[INFO] Voxel coordinates saved")
 
     bbox_gen_input = prepare_bbox_gen_input(os.path.join(output_dir, "voxel_coords.npy"), img_white_bg, ordered_mask_input)
+    # bbox input is a dict
+    
     bbox_gen_output = bbox_gen_model.generate(bbox_gen_input)
     np.save(os.path.join(output_dir, "bboxes.npy"), bbox_gen_output['bboxes'][0])
     bboxes_vis = gen_mesh_from_bounds(bbox_gen_output['bboxes'][0])
@@ -81,6 +89,7 @@ if __name__ == "__main__":
         formats=['mesh', 'gaussian', 'radiance_field'],
         preprocess_image=False,
     )
+    # 得到一个dict，包含mesh, gaussian, radiance_field
     save_parts_outputs(
         part_synthesis_output, 
         output_dir=output_dir, 

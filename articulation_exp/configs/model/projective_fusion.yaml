@@ -1,0 +1,35 @@
+# E3: Projective video-to-SLAT fusion
+model:
+  name: projective_fusion
+  slat_dim: 8
+  video_dim: 1280
+  fusion_dim: 768
+  num_heads: 8
+  use_temporal_pool: true
+  max_parts: 10
+
+  projective:
+    use_camera_pose: true
+    grid_sample_mode: bilinear
+    temporal_aggregation: mean  # mean, attention
+
+decoder:
+  joint_type_classes: 3
+  axis_dim: 3
+  pivot_dim: 3
+  state_dim: 2
+
+training:
+  lr: 5.0e-5
+  weight_decay: 1.0e-5
+  epochs: 150
+  batch_size: 8
+  scheduler: cosine
+  warmup_epochs: 10
+
+loss:
+  lambda_part: 1.0
+  lambda_type: 1.0
+  lambda_axis: 5.0
+  lambda_pivot: 2.0
+  lambda_state: 1.0
